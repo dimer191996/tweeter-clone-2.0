@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+   font-family: 'font-a-medium';
+}
+/* This fires as soon as the element enters the dorm */
+.list-transition-enter,
+.list-transition-appear {
+   /*We give the list the initial dimension of the list button*/
+   top: 0;
+   width: 120px;
+   max-height: 40px;
+   color: transparent;
+   background-color: #5a564c;
+}
+
+/* This is where we can add the transition*/
+.list-transition-enter-active,
+.list-transition-appear-active {
+   top: 45px;
+   width: 200px;
+   max-height: 200px;
+   background-color: #9e8949;
+   transition: all 400ms;
+}
+
+/* This fires as soon as the this.state.showList is false */
+.list-transition-exit {
+   top: 45px;
+   width: 200px;
+   max-height: 200px;
+   background-color: #9e8949;
+}
+
+/* fires as element leaves the DOM*/
+.list-transition-exit-active {
+   top: 0;
+   width: 120px;
+   max-height: 40px;
+   color: transparent;
+   background-color: #5a564c;
+   transition: all 400ms;
+}
