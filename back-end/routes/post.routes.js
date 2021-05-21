@@ -1,30 +1,38 @@
-const router = require("express").Router();
-const postController = require("../controllers/post.controller");
-const commentController = require("../controllers/comment.controller");
-const replyController = require("../controllers/reply.controller");
-const likeController = require("../controllers/like.controller");
+import express from "express";
+import postController from "../controllers/post.controller.js";
+import commentController from "../controllers/comment.controller.js";
+import replyController from "../controllers/reply.controller.js";
+import likeController from "../controllers/like.controller.js";
 //crud post
-router.get("/", postController.readPost);
-router.post("/", postController.createPost);
-router.put("/:id", postController.updatePost);
-router.delete("/:id", postController.deletePost);
+import multer from "multer";
+const upload = multer();
+const app = express.Router();
+
+app.get("/", postController.readPost);
+app.post("/", upload.single("file"), postController.createPost);
+app.put("/:id", postController.updatePost);
+app.delete("/:id", postController.deletePost);
 
 //like and dislike post
-router.patch("/like-post/:id", likeController.like_post);
-router.patch("/unlike-post/:id", likeController.unlike_post);
+app.patch("/like-post/:id", likeController.like_post);
+app.patch("/dislike-post/:id", likeController.unlike_post);
 
 //create a comment + UD comment
-router.patch("/comment-create/:id", commentController.createComment);
-router.patch("/comment-edit/:id", commentController.updateComment);
-router.patch("/comment-delete/:id", commentController.deleteComment);
+app.patch("/comment-create/:id", commentController.createComment);
+app.patch("/comment-edit/:id", commentController.updateComment);
+app.patch("/comment-delete/:id", commentController.deleteComment);
 
 //like comment dislike comment
-router.patch("/like-comment/:id", likeController.like_comment);
-router.patch("/unlike-comment/:id", likeController.unlike_comment);
+app.patch("/like-comment/:id", likeController.like_comment);
+app.patch("/dislike-comment/:id", likeController.unlike_comment);
 
 //create reply to a comment + RUD reply
-router.patch("/reply-create/:id", replyController.createReply);
-router.patch("/reply-edit/:id", replyController.updateReply);
-router.patch("/reply-delete/:id", replyController.deleteReply);
+app.patch("/reply-create/:id", replyController.createReply);
+app.patch("/reply-edit/:id", replyController.updateReply);
+app.patch("/reply-delete/:id", replyController.deleteReply);
 
-module.exports = router;
+//like comment dislike comment
+app.patch("/like-reply/:id", likeController.like_reply);
+app.patch("/dislike-reply/:id", likeController.unlike_reply);
+
+export default app;

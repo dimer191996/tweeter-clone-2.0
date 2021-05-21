@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 mongoose
   .connect(
-    `mongodb+srv://${process.env.DB_USER_PASSWORD}@cluster0.7lpcn.mongodb.net/dimer?retryWrites=true&w=majority`,
+    `mongodb+srv://dimer:mitsubishi@cluster0.7lpcn.mongodb.net/dimer?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,

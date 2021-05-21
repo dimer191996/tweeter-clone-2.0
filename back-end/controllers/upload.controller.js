@@ -1,10 +1,12 @@
-const UserModel = require("../models/user.model");
-const fs = require("fs");
-const { Readable } = require("stream");
-const { promisify } = require("util");
-const pipeline = promisify(require("stream").pipeline);
+import UserModel from "../models/user.model.js";
+import fs from "fs";
+import { Readable } from "stream";
+import stream from "stream";
+import { promisify } from "util";
 
-module.exports.uploadProfile = async (req, res) => {
+const pipeline = promisify(stream.pipeline);
+
+export const uploadProfile = async (req, res) => {
   try {
     console.log("wtf");
     console.log(req.file);
@@ -46,3 +48,4 @@ module.exports.uploadProfile = async (req, res) => {
     return res.status(500).send({ message: err });
   }
 };
+export default { uploadProfile };

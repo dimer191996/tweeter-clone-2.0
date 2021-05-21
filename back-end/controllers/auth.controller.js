@@ -1,9 +1,9 @@
-const UserModel = require("../models/user.model");
-const { createUserToken } = require("../utils/createUserToken.util");
-const { signUpValidator, logInValidator } = require("../utils/validators.util");
-const bcrypt = require("bcrypt");
+import UserModel from "../models/user.model.js";
+import { createUserToken } from "../utils/createUserToken.util.js";
+import { signUpValidator } from "../utils/validators.util.js";
+import bcrypt from "bcrypt";
 
-module.exports.signup = async (req, res) => {
+export const signup = async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
@@ -18,7 +18,7 @@ module.exports.signup = async (req, res) => {
     return res.status(200).send({ errors });
   }
 };
-module.exports.login = async (req, res) => {
+export const login = async (req, res) => {
   const { name, password } = req.body;
   let errors = { name: "", password: "" };
   try {
@@ -50,7 +50,9 @@ module.exports.login = async (req, res) => {
     console.log(error);
   }
 };
-module.exports.logout = async (req, res) => {
+export const logout = async (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
   res.redirect("/login");
 };
+
+export default { login, logout, signup };

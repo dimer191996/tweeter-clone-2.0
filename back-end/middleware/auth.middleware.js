@@ -1,9 +1,9 @@
-const jwt = require("jsonwebtoken");
-const UserModel = require("../models/user.model");
+import jwt from "jsonwebtoken";
+import UserModel from "../models/user.model.js";
 
 //test if there's a real user on evrysingle page
 
-module.exports.checkUser = (req, res, next) => {
+export const checkUser = (req, res, next) => {
   const token = req.cookies.jwt;
   if (token) {
     jwt.verify(token, process.env.TOKEN_SECRET, async (err, decodedToken) => {
@@ -26,20 +26,18 @@ module.exports.checkUser = (req, res, next) => {
 };
 
 //require auth check
-module.exports.checkAuth = (req, res, next) => {
+export const checkAuth = (req, res, next) => {
   const token = req.cookies.jwt;
   if (token) {
     jwt.verify(token, process.env.TOKEN_SECRET, async (err, decodedToken) => {
       if (err) {
-        console.log(err);
-        res.send(200).json("no token");
+        res.send(400).json("Unauthorize Action");
       } else {
         console.log(decodedToken.id);
         next();
       }
     });
   } else {
-    console.log(" There's no token");
-    throw new Error("No token");
+    res.send(400).json("Unauthorize Action");
   }
 };

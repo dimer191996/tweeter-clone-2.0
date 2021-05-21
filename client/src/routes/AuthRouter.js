@@ -8,7 +8,15 @@ export const AuthRouter = ({ component: Component, ...rest }) => {
     <Route
       {...rest}
       render={(props) =>
-        !uid && !loading ? <Redirect to="/login" /> : <Component {...props} />
+        !loading ? (
+          !uid ? (
+            <Redirect to="/login" />
+          ) : (
+            <Component {...props} />
+          )
+        ) : (
+          ""
+        )
       }
     ></Route>
   );

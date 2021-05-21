@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
-const { isEmail } = require("validator");
-const bcrypt = require("bcrypt");
+import mongoose from "mongoose";
+import validator from "validator";
+import bcrypt from "bcrypt";
+
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -19,7 +20,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      validate: [isEmail],
+      validate: [validator.isEmail],
       lowercase: true,
       trim: true,
     },
@@ -63,6 +64,5 @@ userSchema.pre("save", async function (next) {
 //   }
 //   throw Error("User not fund");
 // };
-const userModel = mongoose.model("user", userSchema);
 
-module.exports = userModel;
+export default mongoose.model("user", userSchema);

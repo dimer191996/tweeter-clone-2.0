@@ -1,16 +1,19 @@
-const express = require("express");
+import express from "express";
+import cloudinary from "cloudinary";
 
-const cookieParser = require("cookie-parser");
+import cookieParser from "cookie-parser";
 
-require("dotenv").config({ path: "./config/.env" });
+import dotenv from "dotenv";
+dotenv.config({ path: "./config/.env" });
 
 //monngo db connect
-require("./config/db");
+import "./config/db.js";
 
 //auth middleware
-const { checkUser, checkAuth } = require("./middleware/auth.middleware");
+import { checkUser, checkAuth } from "./middleware/auth.middleware.js";
 
-const cors = require("cors");
+import cors from "cors";
+
 //express
 const app = express();
 
@@ -21,15 +24,25 @@ app.use(
   })
 );
 
-const userRoutes = require("./routes/user.routes");
-const postRoutes = require("./routes/post.routes");
+import userRoutes from "./routes/user.routes.js";
+import postRoutes from "./routes/post.routes.js";
 
 app.use(express.json());
+
 app.use(
   express.urlencoded({
     extended: true,
   })
 );
+
+// cloudinary configuration
+const cloud = cloudinary.v2;
+
+cloud.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 //cookies
 app.use(cookieParser());

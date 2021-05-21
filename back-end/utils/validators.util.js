@@ -1,4 +1,4 @@
-module.exports.signUpValidator = (err) => {
+export const signUpValidator = (err) => {
   let errors = { name: "", password: "", email: "" };
 
   if (err.message.includes("name")) {

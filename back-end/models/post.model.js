@@ -1,6 +1,5 @@
-const nongoose = require("mongoose");
-const { isEmpty } = require("validator");
-const PostSchema = nongoose.Schema(
+import mongoose from "mongoose";
+const PostSchema = mongoose.Schema(
   {
     creatorId: {
       type: String,
@@ -30,50 +29,7 @@ const PostSchema = nongoose.Schema(
     },
     likes: {
       type: [String],
-      require: true,
-    },
-    comments: {
       required: true,
-      type: [
-        {
-          isReady: {
-            type: Boolean,
-            default: true,
-          },
-          creatorId: {
-            type: String,
-            required: true,
-          },
-          creator: {
-            type: String,
-            required: true,
-          },
-          timestamp: Number,
-
-          body: {
-            type: String,
-            required: true,
-            trim: true,
-          },
-          likes: {
-            type: [String],
-            required: true,
-          },
-          replies: {
-            require: true,
-            type: [
-              {
-                creatorId: String,
-                creatorName: String,
-                timestamp: Number,
-                body: {
-                  type: String,
-                },
-              },
-            ],
-          },
-        },
-      ],
     },
   },
   {
@@ -81,4 +37,4 @@ const PostSchema = nongoose.Schema(
   }
 );
 
-module.exports = nongoose.model("post", PostSchema);
+export default mongoose.model("post", PostSchema);

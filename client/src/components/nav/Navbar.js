@@ -1,12 +1,11 @@
 import { useContext } from "react";
-
 import { Link } from "react-router-dom";
 import { uic } from "../../context";
 export default function Navbar() {
-  const { uid } = useContext(uic);
+  const { uid, loading } = useContext(uic);
 
   return (
-    <nav className="bg-white sticky top-0 z-10 border-b dark:bg-gray-800">
+    <nav className="bg-white  border-b dark:bg-gray-800">
       <div className="px-6 py-3 container  mx-auto">
         <div className="md:flex md:items-center md:justify-between">
           <div className="flex items-center justify-between">
@@ -39,39 +38,43 @@ export default function Navbar() {
             <div className="flex flex-col -mx-4 md:flex-row md:items-center md:mx-8"></div>
 
             <div className="flex items-center mt-4 md:mt-0">
-              <>
-                {!uid && (
-                  <div>
-                    <Link
-                      to="/login"
-                      className="px-2 py-1 mx-2 mt-2 text-sm font-medium text-gray-700 transition-colors duration-200 transform rounded-md md:mt-0 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="px-2 py-1 mx-2 mt-2 text-sm font-medium text-gray-700 transition-colors duration-200 transform rounded-md md:mt-0 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700"
-                    >
-                      Register
-                    </Link>
-                  </div>
-                )}
-              </>
-
-              <>
-                {uid && (
-                  <div className="flex">
-                    <div className=" ease-in-out duration-500 mx-6 px-2 rounded shadow hover:bg-blue-800  bg-blue-600">
+              {!loading ? (
+                <>
+                  {!uid ? (
+                    <div>
                       <Link
-                        className="text-xl  font-bold text-white dark:text-white md:text-xl hover:text-white dark:hover:text-gray-300"
-                        to="/create_post"
+                        to="/login"
+                        className="px-2 py-1 mx-2 mt-2 text-sm font-medium text-gray-700 transition-colors duration-200 transform rounded-md md:mt-0 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700"
                       >
-                        <div>Create Post +</div>
+                        Login
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="px-2 py-1 mx-2 mt-2 text-sm font-medium text-gray-700 transition-colors duration-200 transform rounded-md md:mt-0 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700"
+                      >
+                        Register
                       </Link>
                     </div>
+                  ) : (
+                    <div className="flex">
+                      <div className=" ease-in-out duration-500 mx-6 px-2 rounded shadow hover:bg-blue-800  bg-blue-600">
+                        <Link
+                          className="text-xl  font-bold text-white dark:text-white md:text-xl hover:text-white dark:hover:text-gray-300"
+                          to="/create_post"
+                        >
+                          <div>Create Post +</div>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="animate-pulse inline-flex py-2 px-5 hover:bg-blue-100 rounded-full items-center p-1 space-x-3 rounded-md">
+                  <div className="flex-1 mx-2 space-y-4">
+                    <div className="h-6 bg-blue-400 rounded w-32"></div>
                   </div>
-                )}
-              </>
+                </div>
+              )}
             </div>
           </div>
         </div>

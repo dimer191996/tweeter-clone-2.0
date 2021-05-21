@@ -1,28 +1,56 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Home from "../components/pages/Home";
-import Profile from "../components/pages/profile";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  useRouteMatch,
+} from "react-router-dom";
+import Home from "../components/Home";
+import Profile from "../components/_page.profile";
 import Navbar from "../components/nav/Navbar";
-import Login from "../components/pages/auth/Login";
-import Register from "../components/pages/auth/Register";
-import { AuthRouter, PublicRouter } from "./AuthRouter";
+import Login from "../components/_page.auth/Login";
+import Register from "../components/_page.auth/Register";
+import { PublicRouter } from "./AuthRouter";
 import Sidebar from "../components/nav/Sidebar";
 import Leftbar from "../components/nav/Leftbar";
-import PodNav from "../components/nav/PodNav";
+import MobileNav from "../components/nav/MobileNavBar";
+import ProfileHome from "../components/_page.profile/ProfileHome";
 
-export default function index() {
+const routes = [
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/profile",
+    element: <Profile />,
+    children: {
+      path: "/profile",
+      element: <ProfileHome />,
+    },
+  },
+];
+export default function Index() {
   return (
     <Router>
       <div className="flex">
         <Sidebar />
-        <PodNav />
-        <div className="w-full">
+        <MobileNav />
+        <div className="lg:w-3/4 sm:w-full">
           <Navbar />
           <Switch>
             <PublicRouter path="/login" exact component={Login} />
             <PublicRouter path="/register" exact component={Register} />
             <Route path="/" exact component={Home} />
-            <AuthRouter path="/profile" exact component={Profile} />
+            <Route path="/profile" component={Profile}></Route>
             {/* <Redirect to="/" /> */}
           </Switch>
         </div>

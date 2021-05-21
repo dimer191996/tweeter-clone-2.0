@@ -1,12 +1,14 @@
-const userModel = require("../models/user.model");
-const ID = require("mongoose").Types.ObjectId;
+import userModel from "../models/user.model.js";
+import mongoose from "mongoose";
 
-module.exports.getAllUsers = async (req, res) => {
+const ID = mongoose.Types.ObjectId;
+
+export const getAllUsers = async (req, res) => {
   const users = await userModel.find().select("-password");
   res.status(200).json(users);
 };
 
-module.exports.userInfo = async (req, res) => {
+export const userInfo = async (req, res) => {
   !ID.isValid(req.params.id) &&
     res.status(400).send("ID unknown :" + req.params.id);
 
@@ -17,7 +19,7 @@ module.exports.userInfo = async (req, res) => {
     .select("-password");
 };
 
-module.exports.userUpdate = async (req, res) => {
+export const userUpdate = async (req, res) => {
   !ID.isValid(req.params.id) &&
     res.status(400).send("ID unknown :" + req.params.id);
 
@@ -41,7 +43,7 @@ module.exports.userUpdate = async (req, res) => {
   }
 };
 
-module.exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
   !ID.isValid(req.params.id) &&
     res.status(400).send("ID unknown :" + req.params.id);
   try {
@@ -54,7 +56,7 @@ module.exports.deleteUser = async (req, res) => {
   }
 };
 
-module.exports.followUser = async (req, res) => {
+export const followUser = async (req, res) => {
   if (!ID.isValid(req.params.id) || !ID.isValid(req.body.idToFollow)) {
     res.status(400).send("ID unknown :" + req.params.id);
   }
@@ -87,7 +89,7 @@ module.exports.followUser = async (req, res) => {
   }
 };
 
-module.exports.unFollowUser = async (req, res) => {
+export const unFollowUser = async (req, res) => {
   if (!ID.isValid(req.params.id) || !ID.isValid(req.body.idToUnFollow)) {
     res.status(400).send("ID unknown :" + req.params.id);
   }
@@ -122,4 +124,13 @@ module.exports.unFollowUser = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ message: err });
   }
+};
+
+export default {
+  getAllUsers,
+  userUpdate,
+  userInfo,
+  followUser,
+  unFollowUser,
+  deleteUser,
 };
