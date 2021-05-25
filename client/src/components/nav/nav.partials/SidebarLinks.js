@@ -18,7 +18,7 @@ export default function SidebarLinks({ mobile = false }) {
     {
       loading: loading,
       ifUserIn: true,
-      path: "/",
+      path: "/home",
       name: "Home",
       icon: <IconHome />,
     },
@@ -53,7 +53,7 @@ export default function SidebarLinks({ mobile = false }) {
     {
       loading: loading,
       ifUserIn: uid,
-      path: "/profile",
+      path: "/profile/" + uid,
       name: "Profile",
       icon: <IconProfile />,
     },
@@ -77,7 +77,7 @@ export const Link = ({ link, mobile }) => {
         <NavLink
           exact
           to={link.path}
-          activeClassName="bg-blue-200 rounded-full"
+          activeClassName=" text-blue-500 rounded-full"
           className="inline-flex px-3 lg:px-6 ease-in-out duration-500  hover:bg-blue-200 hover:text-blue-500 rounded-full items-center space-x-3 "
         >
           {link.icon}

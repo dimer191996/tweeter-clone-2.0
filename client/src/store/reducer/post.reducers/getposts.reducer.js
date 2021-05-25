@@ -1,8 +1,8 @@
 import {
   ADD_POST,
   GET_POSTS,
-  LOADIND_POSTS,
-  STOP_LOADIND_POSTS,
+  EXPLORE_LOADING_POSTS,
+  STOP_EXPLORE_LOADING_POSTS,
   LIKE_POST,
   ADD_COMMENT,
   LIKE_COMMENT,
@@ -15,94 +15,28 @@ import {
   CLEAN_REPLY_ERROR,
   DELETE_REPLY,
 } from "../../actions/post/post.actions";
+import { getPosts, addPost, likePost } from "./posts";
+import { addComment, ifNoERROR, likeComment, updateComment } from "./comments";
 
-const initialState = [];
+const initialState = {};
 const postsLoading = false;
 
 export const posts = (state = initialState, action) => {
   switch (action.type) {
     case GET_POSTS:
-      return action.payload;
+      return getPosts(state, action);
     case ADD_POST:
-      return [action.payload, ...state];
+      return addPost(state, action);
     case LIKE_POST:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          if (!post.liked) {
-            return {
-              ...post,
-              liked: true,
-              likesCount: ++post.likesCount,
-              // likes: [action.payload.userId, ...post.likes],
-            };
-          } else {
-            return {
-              ...post,
-              liked: false,
-              likesCount: --post.likesCount,
-              // likes: post.likes.filter((id) => id !== action.payload.userId),
-            };
-          }
-        }
-        return post;
-      });
+      return likePost(state, action);
     case ADD_COMMENT:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          ++post.commentsCount;
-          post.comments = [...post.comments, action.payload.preview];
-        }
-        return post;
-      });
-    case LIKE_COMMENT:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          post.comments.map((comment) => {
-            if (comment._id === action.payload.commentId) {
-              if (!comment.isLiked) {
-                comment.isLiked = true;
-                comment.likesCount = ++comment.likesCount;
-              } else {
-                comment.isLiked = false;
-                comment.likesCount = --comment.likesCount;
-              }
-            }
-            return comment;
-          });
-        }
-        return post;
-      });
+      return addComment(state, action);
     case UPDATE_COMMENT:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          post.comments.map((comment) => {
-            if (comment._id === action.payload.commentId) {
-              if (!action.payload.err) {
-                comment._id = action.payload.data._id;
-                comment.isReady = true;
-              } else {
-                comment.isError = true;
-                comment.isReady = true;
-              }
-            }
-            return comment;
-          });
-        }
-        return post;
-      });
+      return updateComment(state, action);
     case CLEAN_COMMENT_ERROR:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          post.comments.map((comment) => {
-            if (comment._id === action.payload.commentId) {
-              comment._id = action.payload.data._id;
-              comment.isError = false;
-            }
-            return comment;
-          });
-        }
-        return post;
-      });
+      return ifNoERROR(state, action);
+    case LIKE_COMMENT:
+      return likeComment(state, action);
     case DELETE_COMMENT:
       return state.map((post) => {
         if (post._id === action.payload.postId) {
@@ -213,9 +147,9 @@ export const posts = (state = initialState, action) => {
 
 export const loadingPost = (state = postsLoading, action) => {
   switch (action.type) {
-    case LOADIND_POSTS:
+    case EXPLORE_LOADING_POSTS:
       return action.payload;
-    case STOP_LOADIND_POSTS:
+    case STOP_EXPLORE_LOADING_POSTS:
       return action.payload;
     default:
       return state;

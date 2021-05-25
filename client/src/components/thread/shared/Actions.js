@@ -1,6 +1,7 @@
 import moment from "moment";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useRouteMatch } from "react-router";
 import {
   likeComment,
   likeReply,
@@ -21,6 +22,7 @@ export const Button = ({ isLoading, isReady, lable, onClick }) => {
   );
 };
 const Actions = ({ mode, item, postId, ...props }) => {
+  const { path } = useRouteMatch();
   const [wait, setWait] = useState(false);
   const dispatch = useDispatch();
 
@@ -34,7 +36,7 @@ const Actions = ({ mode, item, postId, ...props }) => {
 
   function like() {
     if (mode === "comment") {
-      dispatch(likeComment(item._id, postId, item.isLiked, { wait }));
+      dispatch(likeComment(item._id, postId, item.isLiked, { wait }, path));
     }
     if (mode === "reply") {
       dispatch(

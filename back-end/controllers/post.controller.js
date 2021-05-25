@@ -22,11 +22,9 @@ export const readPost = async (req, res) => {
           as: "comments",
         },
       },
-
       {
         $unwind: { path: "$comments", preserveNullAndEmptyArrays: true },
       },
-
       {
         $lookup: {
           from: "replies",
@@ -37,68 +35,6 @@ export const readPost = async (req, res) => {
       },
       {
         $unwind: { path: "$replies", preserveNullAndEmptyArrays: true },
-      },
-      {
-        $addFields: {
-          "replies.likesCount": {
-            $ifNull: [
-              {
-                $size: {
-                  $ifNull: ["$replies.likes", []],
-                },
-              },
-              {},
-            ],
-          },
-          "replies.isLiked": {
-            $cond: {
-              if: {
-                $eq: [
-                  {
-                    $size: {
-                      $ifNull: [
-                        {
-                          $filter: {
-                            input: "$replies.likes",
-                            as: "item",
-                            cond: {
-                              $eq: [
-                                "$$item",
-                                uid, //id of the user whom you wanna check if liked the reply
-                              ],
-                            },
-                          },
-                        },
-                        [],
-                      ],
-                    },
-                  },
-                  0,
-                ],
-              },
-              then: false,
-              else: true,
-            },
-          },
-        },
-      },
-      {
-        $group: {
-          _id: "$comments._id",
-          postId: {
-            $first: "$_id",
-          },
-          createdAt: { $first: "$createdAt" },
-          creator: { $first: "$creator" },
-          creatorId: { $first: "$creatorId" },
-          likes: { $first: "$likes" },
-          //commentsCount: { $first: { $size: "$comments" } },
-          body: { $first: "$body" },
-          comments: {
-            $first: "$comments",
-          },
-          replies: { $push: "$replies" },
-        },
       },
       {
         $addFields: {
@@ -145,11 +81,27 @@ export const readPost = async (req, res) => {
           },
         },
       },
+      // {
+      //   $group: {
+      //     _id: "$comments._id",
+      //     postId: {
+      //       $first: "$_id",
+      //     },
+      //     createdAt: { $first: "$createdAt" },
+      //     creator: { $first: "$creator" },
+      //     creatorId: { $first: "$creatorId" },
+      //     likes: { $first: "$likes" },
+      //     //commentsCount: { $first: { $size: "$comments" } },
+      //     body: { $first: "$body" },
+      //     replies: { $push: "$replies" },
+      //   },
+      // },
       {
         $group: {
-          _id: "$postId",
+          _id: "$_id",
           createdAt: { $first: "$createdAt" },
           creator: { $first: "$creator" },
+          picture: { $first: "$picture" },
           creatorId: { $first: "$creatorId" },
           likesCount: { $first: { $size: "$likes" } },
           liked: { $first: { $in: [uid, "$likes"] } },
@@ -167,6 +119,7 @@ export const readPost = async (req, res) => {
   }
 };
 export const createPost = async (req, res) => {
+  const { uid } = getAuth(req.cookies["jwt"]);
   if (req.body.body !== "" && req.file !== undefined) {
     try {
       if (
@@ -198,6 +151,7 @@ export const createPost = async (req, res) => {
 
   const newPost = new PostModel({
     creator: req.body.creator,
+    creatorId: uid,
     picture: req.file !== undefined ? imageUrl : "",
     title: req.body.title,
     body: req.body.body,

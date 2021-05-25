@@ -3,10 +3,15 @@ const PostSchema = mongoose.Schema(
   {
     creatorId: {
       type: String,
-      // trim: true,
-      // required: true,
+      trim: true,
+      required: true,
     },
     creator: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    creatorId: {
       type: String,
       trim: true,
       required: true,

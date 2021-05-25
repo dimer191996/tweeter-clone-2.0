@@ -1,8 +1,10 @@
 import axios from "axios";
 
 export const GET_POSTS = "GET_POSTS";
-export const LOADIND_POSTS = "LOADIND_POSTS";
-export const STOP_LOADIND_POSTS = "STOP_LOADIND_POSTS";
+export const EXPLORE_LOADING_POSTS = "EXPLORE_LOADIND_POSTS";
+export const STOP_EXPLORE_LOADING_POSTS = "STOP_EXPLORE_LOADIND_POSTS";
+export const PROFILE_LOADING_POSTS = "PROFILE_LOADIND_POSTS";
+export const STOP_PROFILE_LOADING_POSTS = "STOP_PROFILE_LOADIND_POSTS";
 export const ADD_POST = "ADD_POST";
 export const LIKE_POST = "LIKE_POST";
 export const ADD_COMMENT = "ADD_COMMENT";
@@ -19,21 +21,41 @@ export const DELETE_REPLY = "DELETE_REPLY";
 
 ///-------------------------------------------------------------------------------------------------------
 ///--------------------------------------------posts actions-----------------------------------------------
-export const getPosts = (num, uid) => {
+export const getExplorePosts = (path) => {
   return (dispatch) => {
-    dispatch({ type: LOADIND_POSTS, payload: true });
+    dispatch({ type: EXPLORE_LOADING_POSTS, payload: true });
     return axios
       .get(`${"http://localhost:5000/"}api/post/`, {
         withCredentials: true,
       })
       .then(({ data }) => {
-        dispatch({ type: GET_POSTS, payload: data });
-        dispatch({ type: STOP_LOADIND_POSTS, payload: false });
+        dispatch({ type: GET_POSTS, payload: { data, path } });
+        dispatch({ type: STOP_EXPLORE_LOADING_POSTS, payload: false });
       })
-      .catch((err) => dispatch({ type: STOP_LOADIND_POSTS, payload: false }));
+      .catch((err) =>
+        dispatch({ type: STOP_EXPLORE_LOADING_POSTS, payload: false })
+      );
   };
 };
-export const addPost = (post, user, file) => {
+export const getProfilePosts = (path, id) => {
+  return (dispatch) => {
+    dispatch({ type: PROFILE_LOADING_POSTS, payload: true });
+    return axios
+      .get(`${"http://localhost:5000/"}api/user/post/` + id, {
+        withCredentials: true,
+      })
+      .then(({ data }) => {
+        dispatch({ type: GET_POSTS, payload: { data, path } });
+      })
+      .catch((err) =>
+        dispatch({ type: STOP_EXPLORE_LOADING_POSTS, payload: false })
+      )
+      .then(() => {
+        dispatch({ type: STOP_PROFILE_LOADING_POSTS, payload: false });
+      });
+  };
+};
+export const addPost = (post, user, file, tags, path) => {
   return (dispatch) => {
     let data = new FormData();
     data.append("file", file);
@@ -42,7 +64,9 @@ export const addPost = (post, user, file) => {
     data.append("title", post.title);
 
     return axios
-      .post(`${"http://localhost:5000/"}api/post/`, data)
+      .post(`${"http://localhost:5000/"}api/post/`, data, {
+        withCredentials: true,
+      })
       .then(({ data }) => {
         // console.log(res);
         // console.log(res);
@@ -54,13 +78,14 @@ export const addPost = (post, user, file) => {
             liked: false,
             commentsCount: 0,
             comments: [],
+            path,
           },
         });
       })
       .catch((err) => console.log(err));
   };
 };
-export const likePost = (postId, userId, isLiked) => {
+export const likePost = (postId, userId, isLiked, path) => {
   return (dispatch) => {
     const url =
       `${process.env.REACT_APP_API_URL}api/post/${
@@ -69,13 +94,13 @@ export const likePost = (postId, userId, isLiked) => {
 
     return axios
       .patch(url, {}, { withCredentials: true })
-      .then(dispatch({ type: LIKE_POST, payload: { postId, userId } }));
+      .then(dispatch({ type: LIKE_POST, payload: { postId, userId, path } }));
   };
 };
 
 ///-------------------------------------------------------------------------------------------------------
 ///--------------------------------------------comments actions--------------------------------------------
-export const addComment = (comment, { name, id }, postId) => {
+export const addComment = (comment, { name, id }, postId, tags, path) => {
   return (dispatch) => {
     if (!comment.body.trim()) return;
     if (!postId) return;
@@ -103,7 +128,7 @@ export const addComment = (comment, { name, id }, postId) => {
     if (!comment.isError) {
       dispatch({
         type: ADD_COMMENT,
-        payload: { preview, postId },
+        payload: { preview, postId, path },
       });
     }
 
@@ -120,6 +145,7 @@ export const addComment = (comment, { name, id }, postId) => {
             postId,
             commentId: !comment.isError ? preview._id : comment.commentId,
             err: false,
+            path,
           },
         });
       })
@@ -130,6 +156,7 @@ export const addComment = (comment, { name, id }, postId) => {
             postId,
             commentId: !comment.isError ? preview._id : comment.commentId,
             err: true,
+            path,
           },
         });
       });
@@ -151,12 +178,12 @@ export const deleteComment = (commentId, postId) => {
       });
   };
 };
-export const likeComment = (commentId, postId, isLiked, { wait }) => {
+export const likeComment = (commentId, postId, isLiked, { wait }, path) => {
   return (dispatch) => {
     if (wait === true) return;
     dispatch({
       type: LIKE_COMMENT,
-      payload: { postId, commentId, isLiked },
+      payload: { postId, commentId, isLiked, path },
     });
     return axios
       .patch(

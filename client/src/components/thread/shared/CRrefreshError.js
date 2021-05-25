@@ -28,7 +28,6 @@ export default function CRrefreshError(props) {
       setIsLoading(false);
     }
     if (props.mode === "comment") {
-      console.log(props.item);
       await dispatch(
         addComment(
           {

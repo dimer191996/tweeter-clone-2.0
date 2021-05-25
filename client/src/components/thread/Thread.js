@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { Link } from "react-router-dom";
 import moment from "moment";
 import Comments from "./thread.comments/Comments";
 import PActions from "./shared/PActions";
@@ -13,8 +13,8 @@ export default function Thread({ post }) {
   return (
     <div className=" flex ">
       <div className="w-full relative">
-        <div className="py-5 px-6">
-          <div className="bg-white rounded-md xl:px-8 px-2   flex flex-col w-full shadow pt-2">
+        <div className=" border-t">
+          <div className="bg-white xl:px-8 px-2  py-5  flex flex-col w-full  pt-2">
             <div className="inline-flex" href="/">
               <div className=" absolute right-10">
                 <div className=" p-1 cursor-pointer active:bg-gray-200 hover:bg-gray-100 bg-gray-0 rounded-full">
@@ -36,7 +36,12 @@ export default function Thread({ post }) {
                         className="w-10 h-10 mr-4 rounded-full flex-shrink-0 object-cover object-center"
                       />
                       <div className=" text-black opacity-75 text-sm">
-                        <div className=" font-bold">@{post.creator}</div>
+                        <Link
+                          to={"/profile/" + post.creatorId}
+                          className=" font-bold"
+                        >
+                          @{post.creator}
+                        </Link>
                         <div className="font-medium">
                           {moment(post.createdAt).fromNow()}
                         </div>

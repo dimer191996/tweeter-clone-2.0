@@ -5,7 +5,9 @@ import Input from "react-textarea-autosize";
 import { userSelector } from "../../../store/selector/user.selector";
 import { addComment, addReply } from "../../../store/actions/post/post.actions";
 import { sanatize, searchTags } from "../../z_utils";
+import { useRouteMatch } from "react-router";
 export default function Form(props) {
+  const { path } = useRouteMatch();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const { _id, name } = useSelector(userSelector);
@@ -26,7 +28,8 @@ export default function Form(props) {
           },
           { name: name, id: _id },
           props.postId,
-          tags
+          tags,
+          path
         )
       );
 
@@ -40,7 +43,9 @@ export default function Form(props) {
           },
           { name: name, id: _id },
           props.postId,
-          props.commentId
+          props.commentId,
+          tags,
+          path
         )
       );
       values.body = "";

@@ -10,6 +10,7 @@ import Modal from "./shared/Modal";
 import AddPostWithOptions from "./shared/AddPostWithOptions";
 import LoadingOverlay from "./shared/LoadingOverlay";
 import { sanatize, searchTags } from "../z_utils";
+import { useRouteMatch } from "react-router";
 
 export function Form(props) {
   const dispatch = useDispatch();
@@ -17,6 +18,7 @@ export function Form(props) {
   const [pendingNewPost, setPendingNewPost] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [previewImage, setPreviewImage] = useState();
+  const { path } = useRouteMatch();
 
   const { values, onChange, onClickSubmit } = useForm(addpost, {
     title: "",
@@ -55,7 +57,13 @@ export function Form(props) {
     let tags = searchTags(sanatizedBody);
     setPendingNewPost(true);
     await dispatch(
-      addPost({ ...values, body: sanatizedBody }, user, selectedFile, tags)
+      addPost(
+        { ...values, body: sanatizedBody },
+        user,
+        selectedFile,
+        tags,
+        path
+      )
     );
 
     //clear the body and title
@@ -198,8 +206,8 @@ export function Form(props) {
 
 export function OpenPostFormButton(props) {
   return (
-    <div className="mx-6 ">
-      <div className=" w-full shadow rounded-md  px-4 mt-3 py-2 bg-white ">
+    <div className=" ">
+      <div className=" w-full   px-4 py-2 bg-white ">
         <div className="flex items-center">
           <img
             src="https://source.unsplash.com/100x100/?portrait"

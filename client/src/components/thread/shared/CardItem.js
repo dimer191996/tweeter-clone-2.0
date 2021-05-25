@@ -16,6 +16,7 @@ import { DeleteItems } from "./DeleteItems";
 import ActionMenu from "./ActionMenu";
 import Actions from "./Actions";
 import { truncateString, displayBody } from "../../z_utils";
+import { Link } from "react-router-dom";
 
 const CardItem = (props) => {
   const { uid } = useContext(uic);
@@ -118,9 +119,12 @@ const CardItem = (props) => {
                         style={{ fontSize: "14px", wordBreak: "break-word" }}
                         className="text-black mb-0 leading-tight"
                       >
-                        <span className=" font-bold">
+                        <Link
+                          to={`/profile/` + props.item.creatorId}
+                          className=" font-bold"
+                        >
                           @{props.item.creator}
-                        </span>
+                        </Link>
                         <span
                           dangerouslySetInnerHTML={truncateString(
                             displayBody(props.item.body)

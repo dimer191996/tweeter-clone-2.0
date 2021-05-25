@@ -5,17 +5,18 @@ import { IconThumbUp, IconMessages, IconShare } from "../../z_icons";
 import { useDispatch } from "react-redux";
 import { likePost } from "../../../store/actions/post/post.actions";
 import { uic } from "../../../context";
+import { useRouteMatch } from "react-router";
 export default function PActions(props) {
   const { uid } = useContext(uic);
   const dispatch = useDispatch();
-
+  const { path } = useRouteMatch();
   return (
     <FlexWrapper div1=" mt-1 mb-2">
       <PActionButton
         lable="Like"
         type="primary"
         onClick={() =>
-          dispatch(likePost(props.post._id, uid, props.post.liked))
+          dispatch(likePost(props.post._id, uid, props.post.liked, path))
         }
       >
         <IconThumbUp

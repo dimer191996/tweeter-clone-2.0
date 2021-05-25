@@ -14,7 +14,7 @@ export const Profile = (props) => {
           <div className="container mx-auto flex flex-col">
             <div className=" mx-auto ">
               <div className=" relative">
-                <div className="absolute top-40 -right-14 ">
+                <div className="absolute top-20 -right-14 ">
                   <div className=" flex items-center bg-gray-50 px-2 z-10 justify-center  rounded-full h-28 w-28">
                     <div>
                       <img
@@ -32,24 +32,24 @@ export const Profile = (props) => {
             </div>
             <img
               alt="content"
-              className="object-cover border-b object-center h-52 w-full"
+              className="object-cover border-b object-center h-32 w-full"
               src="https://source.unsplash.com/1000x900/?portrait"
             />
           </div>
         </section>
         <section>
           <div className="flex h-38 justify-between bg-white ">
-            <div className=" w-52   overflow-hidden p-3 rounded-md">
+            <div className="   overflow-hidden p-3 rounded-md">
               {user ? (
                 <div className=" flex flex-col tracking-wide  ">
                   {" "}
-                  <h2 className=" text-2xl font-bold text-blue-400">
+                  <span className=" text-2xl font-bold text-black">
                     {user.name}
-                  </h2>
+                  </span>
                   {user.username ?? (
                     <span className="text-gray-300 text-sm">No name</span>
                   )}
-                  <h2 className="  text-gray-600 text-sm font-bold">
+                  <h2 className=" my-2  text-gray-600 text-sm font-bold">
                     {user.email}
                   </h2>
                   <div className=" flex items-center   text-gray-400 text-sm font-medium">
@@ -58,11 +58,18 @@ export const Profile = (props) => {
                       height="20"
                       width="20"
                     />{" "}
-                    Join in {moment(user.createdAt).format("MMM Do Y")}
+                    <span className="pt-1">
+                      Join in {moment(user.createdAt).format("MMM Do Y")}
+                    </span>
                   </div>
-                  <h2 className="  text-gray-400 text-sm font-medium">
-                    0 Following 0 Followers
-                  </h2>
+                  <div className=" my-5  text-gray-800 text-sm ">
+                    <span className=" mr-3 font-bold bg-gray-800 text-white px-3 p-1 rounded-lg">
+                      {user.followersCount} Following
+                    </span>
+                    <span className=" mr-3 font-bold bg-gray-800 text-white px-3 p-1 rounded-lg">
+                      {user.followingCount} Followers
+                    </span>
+                  </div>
                 </div>
               ) : (
                 <div className="">
@@ -86,11 +93,13 @@ export const Profile = (props) => {
                 <div className=" px-3 pl-1 w-52  pt-2   flex justify-center items-center ">
                   {user.bio ?? (
                     <div className=" text-sm">
-                      <div className=" flex justify-center font-bold text-red-500 items-center">
-                        Bio
-                      </div>
-                      What makes you special? Don't think too hard, just have
-                      fun with it.
+                      <span className=" pr-1 font-bold text-blue-500 items-center">
+                        Bio :
+                      </span>
+                      <span>
+                        What makes you special? Don't think too hard, just have
+                        fun with it.
+                      </span>
                     </div>
                   )}
                 </div>

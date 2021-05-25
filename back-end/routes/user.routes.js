@@ -31,4 +31,7 @@ app.patch("/unfollow/:id", userController.unFollowUser);
 //
 app.post("/upload", upload.single("file"), uploadController.uploadProfile);
 
+//profile/auth user posts
+app.get("/post/:id", userController.userPosts);
+
 export default app;

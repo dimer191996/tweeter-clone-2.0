@@ -14,30 +14,8 @@ import { PublicRouter } from "./AuthRouter";
 import Sidebar from "../components/nav/Sidebar";
 import Leftbar from "../components/nav/Leftbar";
 import MobileNav from "../components/nav/MobileNavBar";
-import ProfileHome from "../components/_page.profile/ProfileHome";
+import Explore from "../components/Explore";
 
-const routes = [
-  {
-    path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-  {
-    path: "/profile",
-    element: <Profile />,
-    children: {
-      path: "/profile",
-      element: <ProfileHome />,
-    },
-  },
-];
 export default function Index() {
   return (
     <Router>
@@ -49,8 +27,9 @@ export default function Index() {
           <Switch>
             <PublicRouter path="/login" exact component={Login} />
             <PublicRouter path="/register" exact component={Register} />
-            <Route path="/" exact component={Home} />
-            <Route path="/profile" component={Profile}></Route>
+            <Route path="/home" exact component={Home} />
+            <Route path="/explore" component={Explore} />
+            <Route path="/profile/:id" component={Profile}></Route>
             {/* <Redirect to="/" /> */}
           </Switch>
         </div>

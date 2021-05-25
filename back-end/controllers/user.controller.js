@@ -1,5 +1,7 @@
-import userModel from "../models/user.model.js";
 import mongoose from "mongoose";
+import userModel from "../models/user.model.js";
+import PostModel from "../models/post.model.js";
+import getAuth from "../utils/getAuth.js";
 
 const ID = mongoose.Types.ObjectId;
 
@@ -126,6 +128,170 @@ export const unFollowUser = async (req, res) => {
   }
 };
 
+export const userPosts = async (req, res) => {
+  const { uid } = getAuth(req.cookies["jwt"]);
+  console.log("====================================");
+  console.log(req.params.id);
+  console.log("====================================");
+  try {
+    const posts = await PostModel.aggregate([
+      {
+        $match: {
+          creatorId: req.params.id,
+        },
+      },
+      {
+        $lookup: {
+          from: "comments",
+          localField: "_id",
+          foreignField: "postId",
+          as: "comments",
+        },
+      },
+
+      {
+        $unwind: { path: "$comments", preserveNullAndEmptyArrays: true },
+      },
+
+      {
+        $lookup: {
+          from: "replies",
+          localField: "comments._id",
+          foreignField: "commentId",
+          as: "replies",
+        },
+      },
+      {
+        $unwind: { path: "$replies", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $addFields: {
+          "replies.likesCount": {
+            $ifNull: [
+              {
+                $size: {
+                  $ifNull: ["$replies.likes", []],
+                },
+              },
+              {},
+            ],
+          },
+          "replies.isLiked": {
+            $cond: {
+              if: {
+                $eq: [
+                  {
+                    $size: {
+                      $ifNull: [
+                        {
+                          $filter: {
+                            input: "$replies.likes",
+                            as: "item",
+                            cond: {
+                              $eq: [
+                                "$$item",
+                                uid, //id of the user whom you wanna check if liked the reply
+                              ],
+                            },
+                          },
+                        },
+                        [],
+                      ],
+                    },
+                  },
+                  0,
+                ],
+              },
+              then: false,
+              else: true,
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$comments._id",
+          postId: {
+            $first: "$_id",
+          },
+          createdAt: { $first: "$createdAt" },
+          creator: { $first: "$creator" },
+          creatorId: { $first: "$creatorId" },
+          likes: { $first: "$likes" },
+          //commentsCount: { $first: { $size: "$comments" } },
+          body: { $first: "$body" },
+          comments: {
+            $first: "$comments",
+          },
+          replies: { $push: "$replies" },
+        },
+      },
+      {
+        $addFields: {
+          "comments.replies": "$replies",
+          "comments.likesCount": {
+            $ifNull: [
+              {
+                $size: {
+                  $ifNull: ["$comments.likes", []],
+                },
+              },
+              {},
+            ],
+          },
+          "comments.isLiked": {
+            $cond: {
+              if: {
+                $eq: [
+                  {
+                    $size: {
+                      $ifNull: [
+                        {
+                          $filter: {
+                            input: "$comments.likes",
+                            as: "item",
+                            cond: {
+                              $eq: [
+                                "$$item",
+                                uid, //id of the user whom you wanna check if liked the reply
+                              ],
+                            },
+                          },
+                        },
+                        [],
+                      ],
+                    },
+                  },
+                  0,
+                ],
+              },
+              then: false,
+              else: true,
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$postId",
+          createdAt: { $first: "$createdAt" },
+          creator: { $first: "$creator" },
+          creatorId: { $first: "$creatorId" },
+          likesCount: { $first: { $size: "$likes" } },
+          liked: { $first: { $in: [uid, "$likes"] } },
+          //commentsCount: { $first: { $size: "$comments" } },
+          body: { $first: "$body" },
+          comments: {
+            $push: "$comments",
+          },
+        },
+      },
+    ]).sort({ createdAt: -1 });
+    return res.status(200).send(posts);
+  } catch (error) {
+    return res.status(500).send(JSON.stringify(error.message));
+  }
+};
 export default {
   getAllUsers,
   userUpdate,
@@ -133,4 +299,5 @@ export default {
   followUser,
   unFollowUser,
   deleteUser,
+  userPosts,
 };

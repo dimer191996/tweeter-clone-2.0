@@ -10,7 +10,7 @@ export default function Comments({ comments, postId, ...props }) {
   }
   return (
     props.isOpen && (
-      <div>
+      <div className="mx-4">
         {comments
           ? comments
               .sort(sorted)

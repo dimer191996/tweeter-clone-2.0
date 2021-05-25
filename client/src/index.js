@@ -5,7 +5,6 @@ import { createStore, applyMiddleware, compose } from "redux";
 
 import thunk from "redux-thunk";
 import rootReducer from "./store/reducer";
-import { getPosts } from "./store/actions/post/post.actions";
 
 import App from "./App";
 
@@ -16,7 +15,6 @@ const store = createStore(
     window.devToolsExtension ? window.devToolsExtension() : (f) => f
   )
 );
-store.dispatch(getPosts());
 ReactDOM.render(
   <Provider store={store}>
     <App />

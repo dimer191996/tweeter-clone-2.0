@@ -6,60 +6,53 @@ import {
   Link,
   useParams,
   useRouteMatch,
+  NavLink,
 } from "react-router-dom";
 import Profile from "./Profile";
 import ProfileHome from "./ProfileHome";
 import TalkAndReplies from "./TalkAndReplies";
 
-// Since routes are regular React components, they
-// may be rendered anywhere in the app, including in
-// child elements.
-//
-// This helps when it's time to code-split your app
-// into multiple bundles because code-splitting a
-// React Router app is the same as code-splitting
-// any other React app.
-
-export default function NestingExample() {
+const Index = () => {
   let { path, url } = useRouteMatch();
   return (
-    <div className="bg-gray-50 h-full">
+    <div>
       <Router>
         <Profile />
         <div>
           <div class=" bg-white">
-            <ul class=" flex justify-between  ">
-              <li className="p-1 px-4 hover:bg-blue-100 ">
-                <Link className=" font-bold " to={`${url}`}>
-                  News Feed
-                </Link>
-              </li>
-              <li className="p-1 px-4   hover:bg-blue-100 ">
-                <Link className=" font-bold" to={`${url}/feeds`}>
-                  Talk / Replies
-                </Link>
-              </li>
-              <li className="p-1 px-4   hover:bg-blue-100 ">
-                <Link className=" font-bold" to={`${url}`}>
-                  Home
-                </Link>
-              </li>
-              <li className="p-1 px-4   hover:bg-blue-100 ">
-                <Link className=" font-bold" to={`${url}`}>
-                  Home
-                </Link>
-              </li>
+            <ul class=" flex justify-between text-gray-500 ">
+              <NavLink
+                to={`${url}`}
+                exact
+                activeClassName=" text-blue-500  border-b-4 border-blue-400 "
+                className="pb-2 flex  justify-center pt-2 w-full   hover:bg-blue-100 "
+              >
+                <li className=" px-4 font-bold ">News Feed</li>
+              </NavLink>
+              <NavLink
+                to={`${url}/feeds`}
+                exact
+                activeClassName=" text-blue-500 border-b-4 border-blue-400"
+                className="pb-2 flex  justify-center pt-2 w-full  hover:bg-blue-100 "
+              >
+                <li className=" px-4 font-bold">Talk / Replies</li>
+              </NavLink>
             </ul>
             <hr />
           </div>
+
           <Switch>
-            <Route exact path={`${path}`} component={ProfileHome}>
-              {"home"}
-            </Route>
-            <Route path={`${path}/feeds`} component={TalkAndReplies}></Route>
+            <Route exact path={`${path}`} component={ProfileHome}></Route>
+            <Route
+              exact
+              path={`${path}/feeds`}
+              component={TalkAndReplies}
+            ></Route>
           </Switch>
         </div>
       </Router>
     </div>
   );
-}
+};
+
+export default Index;
