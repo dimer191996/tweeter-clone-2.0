@@ -1,19 +1,23 @@
 export function addComment(state, action) {
   const { payload } = action;
   const result = state[payload.path].result;
-  const data = state[payload.path].entities.data;
-  const post = data[payload.postId];
+  const posts = state[payload.path].entities.posts;
+  const comments = state[payload.path].entities.comments;
 
   return {
     ...state,
     [payload.path]: {
       entities: {
-        data: {
-          ...data,
-          [post._id]: {
-            ...post,
-            comments: [...post.comments, payload.preview],
+        posts: {
+          ...posts,
+          [payload.postId]: {
+            ...posts[payload.postId],
+            comments: [...posts[payload.postId].comments, payload.preview._id],
           },
+        },
+        comments: {
+          ...comments,
+          [payload.preview._id]: payload.preview,
         },
       },
       result,
@@ -24,29 +28,25 @@ export function addComment(state, action) {
 export function updateComment(state, action) {
   const { payload } = action;
   const result = state[payload.path].result;
-  const data = state[payload.path].entities.data;
-  const post = data[payload.postId];
-  const comments = post.comments.map((comment) => {
-    if (comment._id === payload.commentId) {
-      if (!payload.err) {
-        comment._id = payload.data._id;
-        comment.isReady = true;
-      } else {
-        comment.isError = true;
-        comment.isReady = true;
-      }
-    }
-    return comment;
-  });
+  const posts = state[payload.path].entities.posts;
+  const comments = state[payload.path].entities.comments;
+
   return {
     ...state,
     [payload.path]: {
       entities: {
-        data: {
-          ...data,
-          [post._id]: {
-            ...post,
-            comments: [...comments],
+        posts: {
+          ...posts,
+          [payload.postId]: {
+            ...posts[payload.postId],
+            comments: [...posts[payload.postId].comments, payload.data._id],
+          },
+        },
+        comments: {
+          ...comments,
+          [payload.commentId]: {},
+          [payload.data._id]: {
+            ...payload.data,
           },
         },
       },
@@ -58,30 +58,53 @@ export function updateComment(state, action) {
 export function likeComment(state, action) {
   const { payload } = action;
   const result = state[payload.path].result;
-  const data = state[payload.path].entities.data;
-  const post = data[payload.postId];
-  const comments = post.comments.map((comment) => {
-    if (comment._id === action.payload.commentId) {
-      if (!comment.isLiked) {
-        comment.isLiked = true;
-        comment.likesCount = ++comment.likesCount;
-      } else {
-        comment.isLiked = false;
-        comment.likesCount = --comment.likesCount;
-      }
-    }
-    return comment;
-  });
+  const posts = state[payload.path].entities.posts;
+  const comments = state[payload.path].entities.comments;
+  const comment = comments[payload.commentId];
+  if (!comment.isLiked) {
+    comment.isLiked = true;
+    comment.likesCount = ++comment.likesCount;
+  } else {
+    comment.isLiked = false;
+    comment.likesCount = --comment.likesCount;
+  }
+
   return {
     ...state,
     [payload.path]: {
       entities: {
-        data: {
-          ...data,
-          [post._id]: {
-            ...post,
-            comments: [...comments],
+        posts,
+        comments: {
+          ...comments,
+          [payload.commentId]: {
+            ...comment,
           },
+        },
+      },
+      result,
+    },
+  };
+}
+
+export function deleteComment(state, action) {
+  const { payload } = action;
+  const result = state[payload.path].result;
+  const posts = state[payload.path].entities.posts;
+  const comments = state[payload.path].entities.comments;
+
+  return {
+    ...state,
+    [payload.path]: {
+      entities: {
+        posts: {
+          ...posts,
+          [payload.postId]: {
+            ...posts[payload.postId],
+          },
+        },
+        comments: {
+          ...comments,
+          [payload.commentId]: {},
         },
       },
       result,
@@ -92,11 +115,11 @@ export function likeComment(state, action) {
 export function ifNoERROR(state, action) {
   const { payload } = action;
   const result = state[payload.path].result;
-  const data = state[payload.path].entities.data;
-  const post = data[payload.postId];
+  const posts = state[payload.path].entities.posts;
+  const post = posts[payload.postId];
   const comments = post.comments.map((comment) => {
     if (comment._id === action.payload.commentId) {
-      comment._id = action.payload.data._id;
+      comment._id = action.payload.posts._id;
       comment.isError = false;
     }
     return comment;
@@ -105,8 +128,8 @@ export function ifNoERROR(state, action) {
     ...state,
     [payload.path]: {
       entities: {
-        data: {
-          ...data,
+        posts: {
+          ...posts,
           [post._id]: {
             ...post,
             comments: [...comments],

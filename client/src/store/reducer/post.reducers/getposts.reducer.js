@@ -16,7 +16,14 @@ import {
   DELETE_REPLY,
 } from "../../actions/post/post.actions";
 import { getPosts, addPost, likePost } from "./posts";
-import { addComment, ifNoERROR, likeComment, updateComment } from "./comments";
+import {
+  addComment,
+  deleteComment,
+  ifNoERROR,
+  likeComment,
+  updateComment,
+} from "./comments";
+import { addReply, updateReply, deleteReply, likeReply } from "./replies";
 
 const initialState = {};
 const postsLoading = false;
@@ -38,76 +45,16 @@ export const posts = (state = initialState, action) => {
     case LIKE_COMMENT:
       return likeComment(state, action);
     case DELETE_COMMENT:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          return {
-            ...post,
-            commentsCount: --post.commentsCount,
-            comments: post.comments.filter(
-              (comment) => comment._id !== action.payload.commentId
-            ),
-          };
-        } else return post;
-      });
+      return deleteComment(state, action);
     case ADD_REPLY:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          post.comments.map((comment) => {
-            if (comment._id === action.payload.commentId) {
-              comment.replies = [...comment.replies, action.payload.preview];
-            }
-            return comment;
-          });
-        }
-        return post;
-      });
-    case LIKE_REPLY:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          post.comments.map((comment) => {
-            if (comment._id === action.payload.commentId) {
-              comment.replies.map((reply) => {
-                if (reply._id === action.payload.replyId) {
-                  if (!reply.isLiked) {
-                    reply.isLiked = true;
-                    reply.likesCount = ++reply.likesCount;
-                  } else {
-                    reply.isLiked = false;
-                    reply.likesCount = --reply.likesCount;
-                  }
-                }
-                return reply;
-              });
-            }
-            return comment;
-          });
-        }
-        return post;
-      });
+      return addReply(state, action);
     case UPDATE_REPLY:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          post.comments.map((comment) => {
-            if (comment._id === action.payload.commentId) {
-              comment.replies.map((reply) => {
-                if (reply._id === action.payload.replyId) {
-                  if (!action.payload.err) {
-                    reply._id = action.payload.data._id;
-                    reply.isReady = true;
-                  }
-                  if (action.payload.err) {
-                    reply.isReady = true;
-                    reply.isError = action.payload.err;
-                  }
-                }
-                return reply;
-              });
-            }
-            return comment;
-          });
-        }
-        return post;
-      });
+      return updateReply(state, action);
+    case DELETE_REPLY:
+      return deleteReply(state, action);
+    case LIKE_REPLY:
+      return likeReply(state, action);
+
     case CLEAN_REPLY_ERROR:
       return state.map((post) => {
         if (post._id === action.payload.postId) {
@@ -126,20 +73,7 @@ export const posts = (state = initialState, action) => {
         }
         return post;
       });
-    case DELETE_REPLY:
-      return state.map((post) => {
-        if (post._id === action.payload.postId) {
-          post.comments.map((comment) => {
-            if (comment._id === action.payload.commentId) {
-              comment.replies = comment.replies.filter(
-                (reply) => reply._id !== action.payload.replyId
-              );
-            }
-            return comment;
-          });
-        }
-        return post;
-      });
+
     default:
       return state;
   }

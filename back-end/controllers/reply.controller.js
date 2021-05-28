@@ -1,5 +1,5 @@
-import ReplyModel from "../models/reply.model.js";
 import mongoose from "mongoose";
+import ReplyModel from "../models/reply.model.js";
 
 const ID = mongoose.Types.ObjectId;
 
@@ -44,20 +44,11 @@ export const deleteReply = async (req, res) => {
     return res.status(400).send("ID unknown");
   }
   try {
-    await PostModel.findByIdAndUpdate(
-      reply_ID,
-      {
-        $pull: { _id: reply_ID },
-      },
-      { new: true },
-      (err) => {
-        if (!err)
-          return res
-            .status(201)
-            .send({ message: "Reply Deleted Successfully " });
-        return res.status(400).send(err);
-      }
-    );
+    await ReplyModel.findOneAndRemove(reply_ID, (err) => {
+      if (!err)
+        return res.status(201).send({ message: "Reply Deleted Successfully " });
+      return res.status(400).send(err);
+    });
   } catch (error) {
     console.log("replies", error);
   }

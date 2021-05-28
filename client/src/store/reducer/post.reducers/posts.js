@@ -3,32 +3,39 @@ import { normalize, schema } from "normalizr";
 export function getPosts(state, action) {
   const { payload } = action;
   const { data, path } = payload;
-  const posts = new schema.Entity("data", {}, { idAttribute: "_id" });
-  const normalizedPosts = normalize(data, [posts]);
-
-  // Look up the correct post, to simplify the rest of the code
+  const comments = new schema.Entity("comments", {}, { idAttribute: "_id" });
+  const posts = new schema.Entity(
+    "posts",
+    { comments: [comments] },
+    { idAttribute: "_id" }
+  );
+  const normalizedData = normalize(data, [posts]);
 
   return {
     ...state,
-    // Update our Post object with a new "comments" array
-    [path]: normalizedPosts,
+    [path]: {
+      ...normalizedData,
+      loading: false,
+    },
     path,
   };
 }
 
 export function addPost(state, action) {
   const { payload } = action;
-  const data = state[payload.path].entities.data;
+  const posts = state[payload.path].entities.posts;
+  const comments = state[payload.path].entities.comments;
   const result = state[payload.path].result;
 
   return {
     ...state,
     [payload.path]: {
       entities: {
-        data: {
+        posts: {
           [payload._id]: payload,
-          ...data,
+          ...posts,
         },
+        comments,
       },
       result: [payload._id, ...result],
     },
@@ -36,9 +43,10 @@ export function addPost(state, action) {
 }
 export function likePost(state, action) {
   const { payload } = action;
-  const data = state[state.path].entities.data;
-  const result = state[state.path].result;
-  const post = data[payload.postId];
+  const posts = state[payload.path].entities.posts;
+  const comments = state[payload.path].entities.comments;
+  const result = state[payload.path].result;
+  const post = posts[payload.postId];
   if (!post.liked) {
     post.liked = true;
     post.likesCount = ++post.likesCount;
@@ -50,10 +58,11 @@ export function likePost(state, action) {
     ...state,
     [payload.path]: {
       entities: {
-        data: {
-          ...data,
+        posts: {
+          ...posts,
           [post._id]: post,
         },
+        comments,
       },
       result,
     },

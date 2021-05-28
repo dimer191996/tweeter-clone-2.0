@@ -18,10 +18,10 @@ export default function ProfileHome() {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getProfilePosts(path, id));
-  }, []);
+  }, [id]);
   return (
     <div>
-      <Threads loading={loading} posts={posts[path]} />
+      <Threads posts={posts[path]} loading={loading} />
     </div>
   );
 }

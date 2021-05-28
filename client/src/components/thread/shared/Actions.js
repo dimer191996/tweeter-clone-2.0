@@ -40,7 +40,14 @@ const Actions = ({ mode, item, postId, ...props }) => {
     }
     if (mode === "reply") {
       dispatch(
-        likeReply(item._id, item.commentId, postId, item.isLiked, { wait })
+        likeReply(
+          item._id,
+          item.commentId,
+          postId,
+          item.isLiked,
+          { wait },
+          path
+        )
       );
     }
     setWait(true);

@@ -22,9 +22,11 @@ export const readPost = async (req, res) => {
           as: "comments",
         },
       },
+
       {
         $unwind: { path: "$comments", preserveNullAndEmptyArrays: true },
       },
+
       {
         $lookup: {
           from: "replies",
@@ -35,6 +37,68 @@ export const readPost = async (req, res) => {
       },
       {
         $unwind: { path: "$replies", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $addFields: {
+          "replies.likesCount": {
+            $ifNull: [
+              {
+                $size: {
+                  $ifNull: ["$replies.likes", []],
+                },
+              },
+              {},
+            ],
+          },
+          "replies.isLiked": {
+            $cond: {
+              if: {
+                $eq: [
+                  {
+                    $size: {
+                      $ifNull: [
+                        {
+                          $filter: {
+                            input: "$replies.likes",
+                            as: "item",
+                            cond: {
+                              $eq: [
+                                "$$item",
+                                uid, //id of the user whom you wanna check if liked the reply
+                              ],
+                            },
+                          },
+                        },
+                        [],
+                      ],
+                    },
+                  },
+                  0,
+                ],
+              },
+              then: false,
+              else: true,
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$comments._id",
+          postId: {
+            $first: "$_id",
+          },
+          createdAt: { $first: "$createdAt" },
+          creator: { $first: "$creator" },
+          creatorId: { $first: "$creatorId" },
+          likes: { $first: "$likes" },
+          //commentsCount: { $first: { $size: "$comments" } },
+          body: { $first: "$body" },
+          comments: {
+            $first: "$comments",
+          },
+          replies: { $push: "$replies" },
+        },
       },
       {
         $addFields: {
@@ -81,27 +145,12 @@ export const readPost = async (req, res) => {
           },
         },
       },
-      // {
-      //   $group: {
-      //     _id: "$comments._id",
-      //     postId: {
-      //       $first: "$_id",
-      //     },
-      //     createdAt: { $first: "$createdAt" },
-      //     creator: { $first: "$creator" },
-      //     creatorId: { $first: "$creatorId" },
-      //     likes: { $first: "$likes" },
-      //     //commentsCount: { $first: { $size: "$comments" } },
-      //     body: { $first: "$body" },
-      //     replies: { $push: "$replies" },
-      //   },
-      // },
       {
         $group: {
-          _id: "$_id",
+          _id: "$postId",
+
           createdAt: { $first: "$createdAt" },
           creator: { $first: "$creator" },
-          picture: { $first: "$picture" },
           creatorId: { $first: "$creatorId" },
           likesCount: { $first: { $size: "$likes" } },
           liked: { $first: { $in: [uid, "$likes"] } },

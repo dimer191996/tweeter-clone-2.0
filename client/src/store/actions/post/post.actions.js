@@ -18,9 +18,13 @@ export const LIKE_REPLY = "LIKE_REPLY";
 export const UPDATE_REPLY = "UPDATE_REPLY";
 export const CLEAN_REPLY_ERROR = "CLEAN_REPLY_ERROR";
 export const DELETE_REPLY = "DELETE_REPLY";
+export const UPDATE_PATH = "UPDATE_PATH";
 
 ///-------------------------------------------------------------------------------------------------------
 ///--------------------------------------------posts actions-----------------------------------------------
+export const updatePath = (path) => {
+  return (dispatch) => dispatch({ type: UPDATE_PATH, payload: path });
+};
 export const getExplorePosts = (path) => {
   return (dispatch) => {
     dispatch({ type: EXPLORE_LOADING_POSTS, payload: true });
@@ -39,20 +43,18 @@ export const getExplorePosts = (path) => {
 };
 export const getProfilePosts = (path, id) => {
   return (dispatch) => {
-    dispatch({ type: PROFILE_LOADING_POSTS, payload: true });
+    dispatch({ type: EXPLORE_LOADING_POSTS, payload: true });
     return axios
       .get(`${"http://localhost:5000/"}api/user/post/` + id, {
         withCredentials: true,
       })
       .then(({ data }) => {
         dispatch({ type: GET_POSTS, payload: { data, path } });
+        dispatch({ type: STOP_EXPLORE_LOADING_POSTS, payload: false });
       })
       .catch((err) =>
         dispatch({ type: STOP_EXPLORE_LOADING_POSTS, payload: false })
-      )
-      .then(() => {
-        dispatch({ type: STOP_PROFILE_LOADING_POSTS, payload: false });
-      });
+      );
   };
 };
 export const addPost = (post, user, file, tags, path) => {
@@ -141,7 +143,11 @@ export const addComment = (comment, { name, id }, postId, tags, path) => {
         dispatch({
           type: !comment.isError ? UPDATE_COMMENT : CLEAN_COMMENT_ERROR,
           payload: {
-            data,
+            data: {
+              ...data,
+              likesCount: 0,
+              replies: [],
+            },
             postId,
             commentId: !comment.isError ? preview._id : comment.commentId,
             err: false,
@@ -150,19 +156,19 @@ export const addComment = (comment, { name, id }, postId, tags, path) => {
         });
       })
       .catch((error) => {
-        return dispatch({
-          type: UPDATE_COMMENT,
-          payload: {
-            postId,
-            commentId: !comment.isError ? preview._id : comment.commentId,
-            err: true,
-            path,
-          },
-        });
+        // return dispatch({
+        //   type: UPDATE_COMMENT,
+        //   payload: {
+        //     postId,
+        //     commentId: !comment.isError ? preview._id : comment.commentId,
+        //     err: true,
+        //     path,
+        //   },
+        // });
       });
   };
 };
-export const deleteComment = (commentId, postId) => {
+export const deleteComment = (commentId, postId, path) => {
   return (dispatch) => {
     const data = {
       commentId: commentId,
@@ -174,7 +180,10 @@ export const deleteComment = (commentId, postId) => {
         { withCredentials: true }
       )
       .then(({ data }) => {
-        dispatch({ type: DELETE_COMMENT, payload: { postId, commentId } });
+        dispatch({
+          type: DELETE_COMMENT,
+          payload: { postId, commentId, path },
+        });
       });
   };
 };
@@ -199,7 +208,14 @@ export const likeComment = (commentId, postId, isLiked, { wait }, path) => {
 
 ///-------------------------------------------------------------------------------------------------
 ///--------------------------------------------replies-----------------------------------------------
-export const addReply = (reply, { name, id }, postId, commentId) => {
+export const addReply = (
+  reply,
+  { name, id },
+  postId,
+  commentId,
+  tags,
+  path
+) => {
   return (dispatch) => {
     if (!reply.body.trim()) return;
     if (!commentId) return;
@@ -226,7 +242,10 @@ export const addReply = (reply, { name, id }, postId, commentId) => {
     };
 
     if (!reply.isError) {
-      dispatch({ type: ADD_REPLY, payload: { preview, postId, commentId } });
+      dispatch({
+        type: ADD_REPLY,
+        payload: { preview, postId, commentId, path },
+      });
     }
     return axios
       .patch(`${"http://localhost:5000/"}api/post/reply-create/` + postId, data)
@@ -241,6 +260,7 @@ export const addReply = (reply, { name, id }, postId, commentId) => {
             postId,
             replyId: !reply.isError ? preview._id : reply.replyId,
             err: false,
+            path,
           },
         });
       })
@@ -252,12 +272,13 @@ export const addReply = (reply, { name, id }, postId, commentId) => {
             commentId,
             replyId: !reply.isError ? preview._id : reply.replyId,
             err: true,
+            path,
           },
         });
       });
   };
 };
-export const deleteReply = (commentId, replyId, postId) => {
+export const deleteReply = (commentId, replyId, postId, path) => {
   return (dispatch) => {
     const data = {
       commentId: commentId,
@@ -269,17 +290,24 @@ export const deleteReply = (commentId, replyId, postId) => {
       .then(({ data }) => {
         dispatch({
           type: DELETE_REPLY,
-          payload: { postId, commentId, replyId },
+          payload: { postId, commentId, replyId, path },
         });
       });
   };
 };
-export const likeReply = (replyId, commentId, postId, isLiked, { wait }) => {
+export const likeReply = (
+  replyId,
+  commentId,
+  postId,
+  isLiked,
+  { wait },
+  path
+) => {
   return (dispatch) => {
     if (wait === true) return;
     dispatch({
       type: LIKE_REPLY,
-      payload: { postId, commentId, replyId, isLiked },
+      payload: { postId, commentId, replyId, isLiked, path },
     });
     return axios
       .patch(

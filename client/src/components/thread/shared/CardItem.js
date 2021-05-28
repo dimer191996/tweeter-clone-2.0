@@ -16,11 +16,12 @@ import { DeleteItems } from "./DeleteItems";
 import ActionMenu from "./ActionMenu";
 import Actions from "./Actions";
 import { truncateString, displayBody } from "../../z_utils";
-import { Link } from "react-router-dom";
+import { Link, useRouteMatch } from "react-router-dom";
 
 const CardItem = (props) => {
   const { uid } = useContext(uic);
   const isUser = uid === props.item.creatorId;
+  const { path } = useRouteMatch();
   const dispatch = useDispatch();
   const [TranString, setTranString] = useState(200);
   const [OptionsMenu, setOptionsMenu] = useState(false);
@@ -65,13 +66,13 @@ const CardItem = (props) => {
   async function deleteItem() {
     setPendingDeleteItem(true);
     if (props.mode === "comment") {
-      await dispatch(deleteComment(props.item._id, props.postId));
+      await dispatch(deleteComment(props.item._id, props.postId, path));
       resetComfirmationModal();
     }
 
     if (props.mode === "reply") {
       await dispatch(
-        deleteReply(props.commentId, props.item._id, props.postId)
+        deleteReply(props.commentId, props.item._id, props.postId, path)
       );
       resetComfirmationModal();
     }

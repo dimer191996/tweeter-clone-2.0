@@ -1,23 +1,33 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouteMatch } from "react-router";
-import { getExplorePosts } from "../store/actions/post/post.actions";
+import {
+  getExplorePosts,
+  updatePath,
+} from "../store/actions/post/post.actions";
 import {
   loadingPostSelector,
   postSelector,
 } from "../store/selector/post.selector";
 import ThreadForm from "./thread/ThreadForm";
 import Threads from "./thread/Threads";
+import _ from "lodash";
 
 export default function Home() {
   let loading = useSelector(loadingPostSelector);
   const posts = useSelector(postSelector);
   const { path } = useRouteMatch();
-
   const dispatch = useDispatch();
+
   useEffect(() => {
-    dispatch(getExplorePosts(path));
+    fetchData();
   }, []);
+
+  function fetchData() {
+    if (_.isEmpty(posts[path])) {
+      dispatch(getExplorePosts("/home"));
+    }
+  }
   return (
     <section className="text-gray-600 w-full body-font">
       <div className="mx-auto flex flex-col">

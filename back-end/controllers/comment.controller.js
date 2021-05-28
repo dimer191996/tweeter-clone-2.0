@@ -59,7 +59,7 @@ export const deleteComment = async (req, res) => {
     return res.status(400).send("ID unknown :" + post_ID + "-" + comment_ID);
   }
   try {
-    return CommentModel.findByIdAndRemove(comment_ID, (err, doc) => {
+    await CommentModel.findByIdAndRemove(comment_ID, (err, doc) => {
       if (!err) return res.status(200).send({ message: "deleted sucessfully" });
       return res.status(400).send({ message: err });
     });

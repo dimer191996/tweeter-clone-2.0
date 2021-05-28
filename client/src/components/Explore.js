@@ -9,15 +9,20 @@ import {
 import Threads from "./thread/Threads";
 import _ from "lodash";
 export default function Explore() {
+  const dispatch = useDispatch();
   let loading = useSelector(loadingPostSelector);
   const posts = useSelector(postSelector);
   const { path } = useRouteMatch();
 
-  const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getExplorePosts(path));
+    fetchData();
   }, []);
 
+  function fetchData() {
+    if (_.isEmpty(posts[path])) {
+      dispatch(getExplorePosts(path));
+    }
+  }
   return (
     <section className="text-gray-600 w-full body-font">
       <div className="mx-auto flex flex-col">
